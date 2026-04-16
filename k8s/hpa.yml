@@ -1,0 +1,32 @@
+# Horizontal Pod Autoscaler — escala automáticamente según CPU
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: php-app-hpa
+  namespace: lamp
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: php-app
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70   # Escala cuando CPU > 70%
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 30   # Rápido en escalar hacia arriba
+    scaleDown:
+      stabilizationWindowSeconds: 300  # Conservador al bajar réplicas
+
