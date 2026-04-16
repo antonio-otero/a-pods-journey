@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: php-app
+  namespace: lamp
+  labels:
+    app: php-app
+    tier: frontend
+  annotations:
+    # Para CI/CD: el pipeline actualiza este valor para forzar re-deploy
+    deployment.kubernetes.io/revision: "1"
+spec:
+  replicas: 3    # ← Alta disponibilidad: 3 réplicas
+  selector:
+    matchLabels:
+      app: php-app
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1   # Máximo 1 pod caído durante actualización
+      maxSurge: 1         # Máximo 1 pod extra durante actualización
+  template:
+    metadata:
+      labels:
+        app: php-app
+        tier: frontend
+    spec:
+      # Anti-affinity: evitar que dos réplicas caigan en el mismo nodo
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values: [php-app]
+                topologyKey: kubernetes.io/hostname
+      containers:
+        - name: php-app
+          image: ghcr.io/USUARIO/lamp-php:latest
+          ports:
+            - containerPort: 80
+              name: http
+          env:
+            - name: DB_HOST
+              value: mariadb-service   # Service DNS interno
+            - name: DB_PORT
+              value: "3306"
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: mariadb-secret
+                  key: database
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mariadb-secret
+                  key: username
+            - name: DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: mariadb-secret
+                  key: password
+            - name: APP_ENV
+              value: production
+          livenessProbe:
+            httpGet:
+              path: /health.php
+                  port: 80
+            initialDelaySeconds: 20
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health.php
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 2
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+
