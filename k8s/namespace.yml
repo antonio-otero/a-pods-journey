@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: lamp
+  labels:
+    app.kubernetes.io/name: lamp
+    environment: production
