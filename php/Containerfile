@@ -1,0 +1,40 @@
+FROM php:8.2-apache
+ 
+LABEL maintainer="sysadmin@empresa.local"
+LABEL version="1.0"
+ 
+# Instalar extensiones PHP necesarias
+RUN apt-get update && apt-get install -y \
+      libpng-dev libjpeg62-turbo-dev libfreetype6-dev \
+      libonig-dev libxml2-dev libzip-dev zip unzip \
+  && docker-php-ext-configure gd --with-freetype --with-jpeg \
+  && docker-php-ext-install -j$(nproc) \
+   pdo_mysql mysqli gd mbstring xml zip opcache \
+  && apt-get clean && rm -rf /var/lib/apt/lists/*
+ 
+# Configuración PHP optimizada para producción
+RUN echo 'opcache.enable=1' >> /usr/local/etc/php/conf.d/opcache.ini \
+ && echo 'opcache.memory_consumption=128' >> /usr/local/etc/php/conf.d/opcache.ini \
+ && echo 'session.cookie_httponly=1' >> /usr/local/etc/php/conf.d/security.ini \
+ && echo 'session.cookie_secure=0' >> /usr/local/etc/php/conf.d/security.ini \
+ && echo 'expose_php=Off' >> /usr/local/etc/php/conf.d/security.ini \
+ && echo 'display_errors=Off' >> /usr/local/etc/php/conf.d/security.ini \
+ && echo 'log_errors=On' >> /usr/local/etc/php/conf.d/security.ini
+ 
+# Habilitar mod_rewrite para URLs amigables
+RUN a2enmod rewrite headers
+ 
+# Copiar configuración de VirtualHost
+COPY apache/000-default.conf /etc/apache2/sites-available/000-default.conf
+ 
+# Copiar código fuente de la aplicación
+COPY src/ /var/www/html/
+ 
+# Ajustar permisos
+RUN chown -R www-data:www-data /var/www/html \
+ && chmod -R 755 /var/www/html
+ 
+EXPOSE 80
+ 
+HEALTHCHECK --interval=15s --timeout=5s --start-period=20s --retries=3 \
+  CMD curl -fs http://lo
