@@ -1,0 +1,14 @@
+# Persistent Volume Claim — almacenamiento persistente para MariaDB
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mariadb-pvc
+  namespace: lamp
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  # k3s usa local-path provisioner por defecto
+  storageClassName: local-path
