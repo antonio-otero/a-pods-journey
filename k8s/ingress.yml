@@ -1,0 +1,40 @@
+# Ingress — punto de entrada HTTP/HTTPS al cluster
+# k3s incluye Traefik como Ingress Controller por defecto
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: lamp-ingress
+  namespace: lamp
+  annotations:
+    # Redirigir HTTP a HTTPS
+    traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
+    traefik.ingress.kubernetes.io/router.middlewares: lamp-redirect@kubernetescrd
+    # Rate limiting — protección contra fuerza bruta
+    traefik.ingress.kubernetes.io/router.middlewares: lamp-ratelimit@kubernetescrd
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: empresa.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: php-service
+                port:
+                  number: 80
+ - host: pma.empresa.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: phpmyadmin-service
+                port:
+                  number: 80
+  # TLS — certificado auto-gestionado (Let's Encrypt en producción)
+  # tls:
+  #   - hosts: [empresa.local]
+  #     secretName: lamp-tls-secret
