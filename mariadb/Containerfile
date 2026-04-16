@@ -1,0 +1,19 @@
+FROM mariadb:10.11
+ 
+LABEL maintainer="sysadmin@empresa.local"
+LABEL version="1.0"
+LABEL description="MariaDB optimizado para LAMP stack"
+ 
+# Copiar configuración personalizada
+COPY my.cnf /etc/mysql/conf.d/custom.cnf
+ 
+# Copiar script de inicialización (se ejecuta solo la primera vez)
+COPY init.sql /docker-entrypoint-initdb.d/01-init.sql
+ 
+# Exponer puerto (documentativo, el pod comparte red)
+EXPOSE 3306
+ 
+# Healthcheck — evita que PHP intente conectar antes de que MariaDB esté listo
+HEALTHCHECK --interval=10s --timeout=5s --start-period=30s --retries=5 \
+  CMD healthcheck.sh --connect --innodb_initialized || exit 1
+
