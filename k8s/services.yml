@@ -1,0 +1,41 @@
+# Service para MariaDB — ClusterIP (solo accesible internamente)
+apiVersion: v1
+kind: Service
+metadata:
+  name: mariadb-service
+  namespace: lamp
+spec:
+  selector:
+    app: mariadb
+  ports:
+    - port: 3306
+      targetPort: 3306
+  type: ClusterIP
+---
+# Service para PHP — ClusterIP (el Ingress enruta hacia aquí)
+apiVersion: v1
+kind: Service
+metadata:
+  name: php-service
+  namespace: lamp
+spec:
+  selector:
+    app: php-app
+  ports:
+    - port: 80
+      targetPort: 80
+  type: ClusterIP
+---
+# Service para phpMyAdmin
+apiVersion: v1
+kind: Service
+metadata:
+  name: phpmyadmin-service
+  namespace: lamp
+spec:
+  selector:
+    app: phpmyadmin
+  ports:
+    - port: 80
+      targetPort: 80
+  type: ClusterIP
