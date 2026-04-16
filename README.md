@@ -7,7 +7,7 @@
 > and automate everything with **GitHub Actions CI/CD**.
 
 </div>
-<div align="center">
+
 
 ---
 
