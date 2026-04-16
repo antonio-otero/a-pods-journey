@@ -7,6 +7,7 @@
 > and automate everything with **GitHub Actions CI/CD**.
 
 </div>
+<div align="center">
 
 ---
 
@@ -18,7 +19,6 @@
 Clone → Code → Test  ───► Lint → Build → Scan  ───► Deploy → Scale → HA
 VS Code + Podman           GitHub Actions            k3s + Traefik
 
-</div>
 
                   ┌─────────────────────────────────────┐
 PHASE 1           │  Podman Pod (rootless)              │
