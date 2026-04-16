@@ -132,6 +132,36 @@ dist
 !.yarn/plugins
 !.yarn/releases
 !.yarn/sdks
+
+# ── Credenciales y entorno ──────────────────────
+.env
+.env.local
+.env.*.local
+
+# ── Backups de base de datos ────────────────────
+*.sql.gz
+*_backup_*.sql
+dumps/
+
+# ── VS Code ─────────────────────────────────────
+.vscode/
+*.code-workspace
+
+# ── Sistema operativo ───────────────────────────
+.DS_Store
+Thumbs.db
+*~
+
+# ── Logs ────────────────────────────────────────
+*.log
+logs/
+
+# ── Podman / Docker ─────────────────────────────
+.podman/
+*.tar
+
+# ── Node (si hubiera algún script de build) ─────
+node_modules/
 !.yarn/versions
 
 # Vite logs files
