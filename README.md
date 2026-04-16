@@ -1,7 +1,7 @@
 <div align="center">
 
 # 🚀 A Pod's Journey
-### *From Development to Production — A Hands-On LAMP Stack Adventure*
+### *From Dev to Ops — A Hands-On LAMP Stack Adventure*
 
 > Deploy a full LAMP application using **Podman** (rootless), orchestrate it with **Kubernetes (k3s)**,
 > and automate everything with **GitHub Actions CI/CD**.
