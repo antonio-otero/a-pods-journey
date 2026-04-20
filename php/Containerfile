@@ -1,4 +1,13 @@
 FROM php:8.2-apache
+
+# Fix rootless Podman: forzar exit 0 aunque tar no pueda cambiar permisos
+RUN mv /usr/bin/tar /usr/bin/tar.real && \
+    printf '#!/bin/sh\n/usr/bin/tar.real --no-same-owner "$@"; exit 0\n' \
+    > /usr/bin/tar && \
+    chmod +x /usr/bin/tar
+
+
+ENV TAR_OPTIONS="--no-same-owner"
  
 LABEL maintainer="sysadmin@empresa.local"
 LABEL version="1.0"
@@ -30,9 +39,11 @@ COPY apache/000-default.conf /etc/apache2/sites-available/000-default.conf
 # Copiar código fuente de la aplicación
 COPY src/ /var/www/html/
  
+COPY --chmod=755 --chown=www-data:www-data src/ /var/www/html/
+
 # Ajustar permisos
-RUN chown -R www-data:www-data /var/www/html \
- && chmod -R 755 /var/www/html
+#RUN chown -R www-data:www-data /var/www/html \
+# && chmod -R 755 /var/www/html
  
 EXPOSE 80
  
